@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f7f3">
+  <meta name="description" content="Trải nghiệm sản phẩm bằng AR và khảo sát nghiên cứu truyền thông marketing. Prototype học thuật độc lập.">
+  <title>Beyond the Product | Biti's AR Research</title>
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script>
+  <script src="./questionnaire.js"></script>
+  <style>
+    :root{--ink:#1e3028;--deep:#233f32;--green:#496e5b;--pale:#eef3ee;--paper:#fff;--bg:#f6f7f3;--muted:#66736b;--line:#dce4db;--shadow:0 28px 65px rgba(41,57,43,.055)}
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;color:var(--ink);background:var(--bg);font-family:Arial,Helvetica,sans-serif;font-size:14px;-webkit-font-smoothing:antialiased}
+    button,input,textarea,select{font:inherit}
+    button{cursor:pointer}
+    a{color:inherit;text-decoration:none}
+    .container{width:min(1320px,calc(100% - 92px));margin-inline:auto}
+    header{height:82px;background:rgba(255,255,255,.92);border-bottom:1px solid var(--line);display:flex;align-items:center}
+    .header-inner{display:flex;align-items:center;justify-content:space-between;gap:20px}
+    .logo{font:600 22px Georgia,serif;letter-spacing:-.8px;white-space:nowrap}
+    .logo b{color:var(--green);font-weight:600}
+    .research-wordmark{font-size:10px;letter-spacing:2px;color:var(--muted);margin-left:24px;border-left:1px solid var(--line);padding-left:23px;vertical-align:2px}
+    .header-right{display:flex;align-items:center;gap:24px}
+    .nav-link{font-size:12px;font-weight:700;letter-spacing:.35px}
+    .lang-btn{color:var(--deep);border:1px solid var(--line);padding:10px 13px;background:#fff;border-radius:2px;font-size:12px;font-weight:700}
+    .topline{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:38px}
+    .eyebrow{font-size:11px;letter-spacing:2.3px;color:var(--green);font-weight:700;text-transform:uppercase}
+    .tag{font-size:10px;letter-spacing:1.1px;border:1px solid var(--line);color:var(--muted);padding:7px 10px;background:var(--paper)}
+    .headline{display:flex;justify-content:space-between;align-items:end;gap:28px;margin-top:18px;margin-bottom:30px}
+    h1{font:400 clamp(40px,4.3vw,66px)/1.06 Georgia,'Times New Roman',serif;letter-spacing:-1.8px;max-width:760px;margin:0}
+    h1 em{color:var(--green);font-weight:400}
+    .summary{font-size:13px;line-height:1.8;color:var(--muted);max-width:360px;margin:0 0 5px}
+    .main-grid{display:grid;grid-template-columns:minmax(0,1.26fr) minmax(370px,.74fr);gap:20px;align-items:stretch;margin-bottom:27px}
+    .viewer-card,.survey-card{background:#fff;border:1px solid var(--line);box-shadow:var(--shadow);min-width:0}
+    .viewer-top{padding:24px 29px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .section-step{font-size:10px;letter-spacing:2.2px;color:var(--green);font-weight:700}
+    .product-ref{font-size:11px;color:var(--muted)}
+    .stage{height:450px;margin:0 17px;position:relative;background:linear-gradient(145deg,#f4f6f2 0%,#e8eee9 100%);overflow:hidden;border:1px solid #e3e9e2}
+    .stage:before{content:"";height:390px;width:390px;border-radius:50%;background:rgba(255,255,255,.47);position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);pointer-events:none}
+    .fallback-image{position:absolute;left:50%;top:49%;transform:translate(-50%,-50%);width:min(79%,575px);height:92%;object-fit:contain;pointer-events:none;filter:drop-shadow(0 17px 23px rgba(54,68,58,.10));transition:opacity .25s ease}
+    .fallback-image[hidden]{display:none}
+    model-viewer{display:block;position:absolute;inset:0;width:100%;height:100%;--poster-color:transparent}
+    .viewer-badge{position:absolute;left:17px;top:16px;z-index:2;background:rgba(255,255,255,.92);border:1px solid rgba(218,226,218,.8);padding:8px 11px;font-size:10px;letter-spacing:1.3px;color:var(--deep);pointer-events:none}
+    .model-note{position:absolute;left:17px;bottom:18px;z-index:2;font-size:11px;color:#52675a;background:rgba(255,255,255,.86);padding:9px 12px;pointer-events:none;max-width:50%}
+    .ar-btn{position:absolute;right:17px;bottom:18px;z-index:3;border:0;background:var(--deep);color:#fff;font-size:12px;font-weight:700;letter-spacing:.35px;padding:15px 19px;box-shadow:0 9px 22px rgba(35,63,50,.16)}
+    .ar-btn:hover{background:#315844}
+    .viewer-lower{display:flex;justify-content:space-between;gap:12px;align-items:start;padding:20px 29px 20px}
+    .model-title{font:400 22px/1.15 Georgia,serif;margin:0 0 6px}
+    .model-description{font-size:12px;line-height:1.55;color:var(--muted);margin:0}
+    .reference-link{font-size:11px;text-decoration:underline;text-underline-offset:3px;white-space:nowrap;color:var(--green)}
+    .material-strip{border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(3,1fr)}
+    .material{padding:17px 22px;border-right:1px solid var(--line)}
+    .material:last-child{border-right:0}
+    .material strong{display:block;font-size:12px;font-weight:700;margin-bottom:5px}
+    .material span{font-size:11px;line-height:1.55;color:var(--muted)}
+    .survey-card{padding:25px 29px;display:flex;flex-direction:column}
+    .survey-title{font:400 31px/1.12 Georgia,serif;margin:11px 0 9px}
+    .survey-desc{margin:0 0 17px;font-size:12px;line-height:1.7;color:var(--muted)}
+    .sample-label{font-size:10px;color:#6f6551;background:#f5f1e7;border:1px solid #e6ddcb;padding:7px 10px;margin:0 0 15px;display:inline-block;align-self:start}
+    .question-item{padding:15px 0;border-top:1px solid var(--line)}
+    .question-number{font-size:10px;color:var(--green);letter-spacing:1.3px;font-weight:700}
+    .question-text{font-size:13px;line-height:1.5;margin:7px 0 14px;font-weight:600}
+    .rating-row{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px}
+    .rating-row label{display:block;margin:0;cursor:pointer}
+    .rating-row input{position:absolute;opacity:0;width:1px;height:1px}
+    .rating-row span{display:grid;place-items:center;height:38px;border:1px solid #dce4da;background:#fafbf9;font-size:12px;transition:all .12s;color:var(--muted)}
+    .rating-row input:checked+span{border-color:var(--deep);background:var(--deep);color:#fff}
+    .rating-row input:focus-visible+span{outline:2px solid #668c72;outline-offset:2px}
+    .scale-labels{display:flex;justify-content:space-between;gap:12px;margin-top:8px;font-size:10px;color:var(--muted)}
+    .field{width:100%;padding:11px;border:1px solid var(--line);border-radius:0;line-height:1.4;background:white}
+    textarea.field{min-height:82px;resize:vertical}
+    .check{display:flex;gap:10px;align-items:flex-start;font-size:11px;line-height:1.55;color:var(--muted);margin:16px 0}
+    .check input{margin:2px 0 0;accent-color:var(--deep);flex-shrink:0}
+    .submit-btn{width:100%;background:var(--deep);border:1px solid var(--deep);color:#fff;padding:15px 20px;font-size:12px;letter-spacing:.6px;font-weight:700}
+    .submit-btn:hover{background:#315744}
+    .submit-btn:disabled{opacity:.65;cursor:progress}
+    .storage-status{margin-top:12px;font-size:11px;line-height:1.6;color:#667b6d}
+    .notice{margin-top:13px;font-size:12px;line-height:1.5;color:var(--green)}
+    .notice.error{color:#a14a3d}
+    .empty-survey{padding:25px 0;font-size:13px;color:var(--muted)}
+    .footer{border-top:1px solid var(--line);padding:21px 0 35px;display:flex;justify-content:space-between;align-items:center;gap:18px;color:var(--muted);font-size:11px;line-height:1.7}
+    .dev-tools summary{cursor:pointer;color:var(--green)}
+    .dev-tools button{border:1px solid var(--line);background:#fff;color:var(--ink);font-size:11px;padding:8px 11px;margin:7px 0}
+    .sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    @media(max-width:1100px){.container{width:min(100% - 42px,960px)}.main-grid{grid-template-columns:1fr}.stage{height:520px}.headline{align-items:start}.summary{max-width:330px}}
+    @media(max-width:700px){header{height:67px}.research-wordmark{display:none}.header-right{gap:12px}.topline{margin-top:26px}.tag{display:none}.headline{display:block;margin-bottom:23px}h1{font-size:41px}.summary{max-width:none;margin-top:15px}.container{width:calc(100% - 30px)}.stage{height:370px;margin:0 10px}.viewer-top,.viewer-lower{padding-left:18px;padding-right:18px}.viewer-badge{left:10px;top:11px}.ar-btn{right:10px;bottom:12px;padding:12px}.model-note{left:10px;bottom:12px;max-width:45%;font-size:10px}.viewer-lower{display:block}.reference-link{display:inline-block;margin-top:10px}.material{padding:13px 9px}.material span{font-size:10px}.survey-card{padding:23px 20px}.footer{display:block}}
+    @media(max-width:395px){.stage{height:320px}.material-strip{grid-template-columns:1fr}.material{border-right:0;border-bottom:1px solid var(--line)}.model-note{display:none}}
+  </style>
+</head>
+<body>
+<header>
+  <div class="container header-inner">
+    <div><span class="logo">Biti's <b>×</b> AR</span><span class="research-wordmark">RESEARCH EXPERIENCE</span></div>
+    <div class="header-right">
+      <a href="#survey" class="nav-link" data-i18n="surveyNav">Bảng hỏi</a>
+      <button class="lang-btn" type="button" id="languageToggle" aria-label="Change language">EN / VI</button>
+    </div>
+  </div>
+</header>
+<main class="container">
+  <div class="topline">
+    <span class="eyebrow">IMMERSIVE MARKETING · RESEARCH PROTOTYPE</span>
+    <span class="tag">01 / EXPERIENCE &nbsp;&nbsp; 02 / SURVEY</span>
+  </div>
+  <div class="headline">
+    <h1 data-i18n-html="heroTitle">Nhìn gần hơn.<br><em>Hiểu sâu hơn.</em></h1>
+    <p class="summary" data-i18n="heroText">Một trải nghiệm AR giúp bạn khám phá sản phẩm trong không gian thật. Sau đó, hãy chia sẻ cảm nhận của bạn qua bảng hỏi ngắn.</p>
+  </div>
+  <div class="main-grid">
+    <section class="viewer-card" aria-label="Product AR experience">
+      <div class="viewer-top">
+        <span class="section-step">01 &nbsp;/&nbsp; AR EXPERIENCE</span>
+        <span class="product-ref">BITI'S HUNTER MATRIC 10 · HSW017500TRG</span>
+      </div>
+      <div class="stage">
+        <span class="viewer-badge" data-i18n="viewerLabel">MÔ HÌNH 3D · TƯƠNG TÁC</span>
+        <img class="fallback-image" id="fallbackImage" src="./shoe-cutout.png" alt="Ảnh tham chiếu Biti’s Hunter Matric 10" aria-hidden="true">
+        <model-viewer
+          id="shoeViewer"
+          src="./matric10-inspired.glb"
+          poster="./product-reference.jpg"
+          alt="Mô hình 3D minh họa giày Biti's Hunter Matric 10 trắng bạc đen"
+          camera-controls
+          auto-rotate
+          rotation-per-second="20deg"
+          interaction-prompt="auto"
+          ar
+          ar-modes="webxr scene-viewer quick-look"
+          ar-scale="fixed"
+          shadow-intensity="1.1"
+          exposure="1.15"
+          environment-image="neutral"
+          touch-action="pan-y">
+        </model-viewer>
+        <div class="model-note" data-i18n="viewerHint">Kéo để xoay · Chụm để phóng to</div>
+        <button class="ar-btn" id="launchAR" type="button" data-i18n="arButton">ĐẶT GIÀY VÀO KHÔNG GIAN THẬT ↗</button>
+      </div>
+      <div class="viewer-lower">
+        <div>
+          <h2 class="model-title">Biti's Hunter Matric 10</h2>
+          <p class="model-description" data-i18n="productSub">Mẫu nữ màu trắng · HSW017500TRG · Mô hình 3D dựng minh họa, không phải bản quét chính thức.</p>
+          <p id="arMessage" class="notice" role="status" aria-live="polite"></p>
+        </div>
+        <a class="reference-link" href="https://bitis.com.vn/products/giay-the-thao-nu-biti-s-hunter-matric-10-mau-trang-hsw017500trg" target="_blank" rel="noopener noreferrer" data-i18n="originalProduct">Sản phẩm gốc ↗</a>
+      </div>
+      <div class="material-strip">
+        <div class="material"><strong data-i18n="materials1">Dây giày</strong><span data-i18n="materials1Desc">Thiết kế dây buộc màu trắng.</span></div>
+        <div class="material"><strong data-i18n="materials2">Thân giày</strong><span data-i18n="materials2Desc">Phối lưới trắng, bạc và nét đen.</span></div>
+        <div class="material"><strong data-i18n="materials3">Đế giày</strong><span data-i18n="materials3Desc">Đế tạo hình nhiều lớp, tông sáng.</span></div>
+      </div>
+    </section>
+    <section class="survey-card" id="survey" aria-label="Research questionnaire">
+      <span class="section-step">02 &nbsp;/&nbsp; QUESTIONNAIRE</span>
+      <h2 class="survey-title" data-i18n-html="surveyTitle">Chia sẻ cảm nhận<br>của bạn.</h2>
+      <p class="survey-desc" data-i18n="surveyDescription">Sau khi xem sản phẩm hoặc thử AR, hãy cho biết ý kiến của bạn. Bảng hỏi có thể được thay bằng thang đo chính thức mà không cần sửa giao diện.</p>
+      <span class="sample-label" id="demoLabel" data-i18n="demoLabel">CÂU HỎI MẪU · CHƯA PHẢI THANG ĐO CHÍNH THỨC</span>
+      <form id="surveyForm">
+        <div id="questionList"></div>
+        <div class="check">
+          <input type="checkbox" id="consent" required>
+          <label for="consent" data-i18n="consent">Tôi đồng ý gửi câu trả lời ẩn danh phục vụ thử nghiệm nghiên cứu. Tôi hiểu đây là website prototype độc lập, không thuộc Biti's.</label>
+        </div>
+        <button class="submit-btn" type="submit" id="submitButton" data-i18n="submit">GỬI CÂU TRẢ LỜI ↗</button>
+        <div class="storage-status" id="storageStatus"></div>
+        <p class="notice" id="submitStatus" role="status" aria-live="polite"></p>
+      </form>
+      <div class="empty-survey" id="emptySurvey" hidden data-i18n="noQuestions">Chưa có bảng hỏi. Hãy thêm câu hỏi vào file questionnaire.js.</div>
+    </section>
+  </div>
+  <footer class="footer">
+    <span data-i18n="footer">Prototype học thuật độc lập · Hình ảnh tham chiếu do người dùng cung cấp · Chất liệu chi tiết chưa được xác minh · AR cần thiết bị hỗ trợ và HTTPS.</span>
+    <details class="dev-tools"><summary data-i18n="researchTools">Dữ liệu thử nghiệm</summary><button type="button" id="exportCSV" data-i18n="exportCSV">Xuất dữ liệu CSV cục bộ</button></details>
+  </footer>
+</main>
+<script>
+/* ===========================================================
+   CHỈNH GOOGLE SHEETS Ở ĐÂY:
+   1. Tạo một Google Sheet và dán apps-script.gs vào Apps Script.
+   2. Deploy as Web app (Anyone; Execute as Me).
+   3. Dán URL /exec vào bên dưới.
+   Nếu để trống, form lưu thử ở trình duyệt và KHÔNG gửi về Sheet.
+=========================================================== */
+const APPS_SCRIPT_URL = '';
+const LOCAL_BACKUP_KEY = 'bitis-ar-research-local-responses-v1';
+
+const translations = {
+  vi: {
+    surveyNav:'Bảng hỏi',heroTitle:'Nhìn gần hơn.<br><em>Hiểu sâu hơn.</em>',
+    heroText:'Một trải nghiệm AR giúp bạn khám phá sản phẩm trong không gian thật. Sau đó, hãy chia sẻ cảm nhận của bạn qua bảng hỏi ngắn.',
+    viewerLabel:'MÔ HÌNH 3D · TƯƠNG TÁC',viewerHint:'Kéo để xoay · Chụm để phóng to',
+    arButton:'ĐẶT GIÀY VÀO KHÔNG GIAN THẬT ↗',
+    productSub:'Mẫu nữ màu trắng · HSW017500TRG · Mô hình 3D dựng minh họa, không phải bản quét chính thức.',
+    originalProduct:'Sản phẩm gốc ↗',materials1:'Dây giày', materials1Desc:'Thiết kế dây buộc màu trắng.',
+    materials2:'Thân giày',materials2Desc:'Phối lưới trắng, bạc và nét đen.',
+    materials3:'Đế giày',materials3Desc:'Đế tạo hình nhiều lớp, tông sáng.',
+    surveyTitle:'Chia sẻ cảm nhận<br>của bạn.',
+    surveyDescription:'Sau khi xem sản phẩm hoặc thử AR, hãy cho biết ý kiến của bạn. Bảng hỏi có thể được thay bằng thang đo chính thức mà không cần sửa giao diện.',
+    demoLabel:'CÂU HỎI MẪU · CHƯA PHẢI THANG ĐO CHÍNH THỨC',
+    consent:"Tôi đồng ý gửi câu trả lời ẩn danh phục vụ thử nghiệm nghiên cứu. Tôi hiểu đây là website prototype độc lập, không thuộc Biti's.",
+    submit:'GỬI CÂU TRẢ LỜI ↗',
+    noQuestions:'Chưa có bảng hỏi. Hãy thêm câu hỏi vào file questionnaire.js.',
+    footer:'Prototype học thuật độc lập · Hình ảnh tham chiếu do người dùng cung cấp · Chất liệu chi tiết chưa được xác minh · AR cần thiết bị hỗ trợ và HTTPS.',
+    researchTools:'Dữ liệu thử nghiệm',exportCSV:'Xuất dữ liệu CSV cục bộ',
+    stronglyDisagree:'Rất không đồng ý',stronglyAgree:'Rất đồng ý',
+    demoStorage:'CHẾ ĐỘ DEMO: Dữ liệu chỉ lưu trên trình duyệt này; chưa kết nối Google Sheets.',
+    sheetConfigured:'Đã cấu hình gửi Google Sheets. Câu trả lời sẽ được kiểm tra xác nhận sau khi gửi.',
+    saving:'Đang gửi dữ liệu...',savedLocal:'Đã lưu bản thử trên trình duyệt. Chưa có dữ liệu gửi đến Google Sheets.',
+    savedSheet:'Đã lưu thành công vào Google Sheets. Cảm ơn bạn!',
+    receiptUnknown:'Đã gửi yêu cầu nhưng chưa xác nhận được Google Sheets. Đã giữ bản sao cục bộ; hãy kiểm tra Sheet.',
+    incomplete:'Vui lòng trả lời đầy đủ và đồng ý trước khi gửi.',
+    noAR:'Thiết bị hoặc trình duyệt này chưa hỗ trợ đặt giày vào không gian thật. Bạn vẫn có thể xoay mô hình 3D.',
+    arOpening:'Đang mở chế độ AR trên điện thoại...',arFailed:'Không thể mở AR. Hãy dùng điện thoại hỗ trợ AR và truy cập website qua HTTPS.',
+    exportEmpty:'Chưa có câu trả lời được lưu trên trình duyệt.'
+  },
+  en: {
+    surveyNav:'Questionnaire',heroTitle:'See closer.<br><em>Understand more.</em>',
+    heroText:'An AR experience that brings a product into your real world. Then share your impressions through a short questionnaire.',
+    viewerLabel:'INTERACTIVE · 3D MODEL',viewerHint:'Drag to rotate · Pinch to zoom',
+    arButton:'PLACE THE SHOE IN YOUR SPACE ↗',
+    productSub:'White women’s sneaker · HSW017500TRG · Illustrative 3D concept, not an official scan.',
+    originalProduct:'Original product ↗',materials1:'Laces',materials1Desc:'White lace-up design.',
+    materials2:'Upper',materials2Desc:'White mesh look, silver and black accents.',
+    materials3:'Sole',materials3Desc:'Layered sculptural sole in light tones.',
+    surveyTitle:'Tell us what<br>you think.',
+    surveyDescription:'After viewing the product or trying AR, share your impressions. The questionnaire can later be replaced with the finalized research scales without changing this layout.',
+    demoLabel:'SAMPLE QUESTIONS · NOT A VALIDATED RESEARCH SCALE',
+    consent:"I consent to submitting anonymous responses for this research prototype. I understand this independent site is not affiliated with Biti's.",
+    submit:'SUBMIT RESPONSES ↗',
+    noQuestions:'No questions configured yet. Edit questionnaire.js to add items.',
+    footer:'Independent academic prototype · User-provided reference image · Detailed material specifications are unverified · AR requires a compatible phone and HTTPS.',
+    researchTools:'Demo data',exportCSV:'Export local CSV',
+    stronglyDisagree:'Strongly disagree',stronglyAgree:'Strongly agree',
+    demoStorage:'DEMO MODE: Responses are stored in this browser only; Google Sheets is not connected.',
+    sheetConfigured:'Google Sheets endpoint configured. Submission will be checked for confirmation.',
+    saving:'Submitting data...',savedLocal:'Demo response saved in this browser. Nothing was sent to Google Sheets.',
+    savedSheet:'Your response has been saved to Google Sheets. Thank you!',
+    receiptUnknown:'Request sent, but Google Sheets could not be confirmed. A local backup was kept; please check the Sheet.',
+    incomplete:'Please answer all required items and provide consent.',
+    noAR:'Your device or browser does not support placing the shoe in real space. You can still rotate the 3D model.',
+    arOpening:'Opening AR mode on your phone...',arFailed:'Could not open AR. Try a compatible phone over HTTPS.',
+    exportEmpty:'No responses are stored in this browser yet.'
+  }
+};
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+let lang = 'vi';
+const survey = window.QUESTIONNAIRE || {version:'unconfigured',isDemo:false,questions:[]};
+const questions = Array.isArray(survey.questions) ? survey.questions : [];
+const stats = {arLaunchClicked:0, arEntered:false, viewerInteractions:0};
+const idString = () => {
+  if (window.crypto && typeof crypto.randomUUID === 'function') return crypto.randomUUID().replace(/-/g,'');
+  return (Math.random().toString(36).slice(2)+Date.now().toString(36)).padEnd(12,'0');
+};
+const sessionId = 'p_' + idString();
+function i18n(key){return (translations[lang]||translations.vi)[key]||key;}
+function setLanguage(value){
+  lang=value;document.documentElement.lang=lang;
+  $$('[data-i18n]').forEach(el=>{el.textContent=i18n(el.dataset.i18n)});
+  $$('[data-i18n-html]').forEach(el=>{el.innerHTML=i18n(el.dataset.i18nHtml)});
+  $('#languageToggle').textContent=lang==='vi'?'EN / VI':'VI / EN';
+  renderSurvey();
+  updateStorageHint();
+}
+$('#languageToggle').addEventListener('click',()=>setLanguage(lang==='vi'?'en':'vi'));
+function renderSurvey(){
+  const prev = Object.fromEntries(new FormData($('#surveyForm')).entries());
+  const list=$('#questionList');list.replaceChildren();
+  $('#demoLabel').hidden=!survey.isDemo;
+  $('#emptySurvey').hidden=questions.length>0;
+  $('#surveyForm').hidden=questions.length===0;
+  questions.forEach((q,index)=>{
+    if(!q || !q.id) return;
+    const wrap=document.createElement('div');wrap.className='question-item';
+    const number=document.createElement('div');number.className='question-number';number.textContent='QUESTION '+String(index+1).padStart(2,'0');wrap.append(number);
+    const text=document.createElement('div');text.className='question-text';text.textContent=(lang==='vi'?q.vi:q.en)||q.vi||q.id;wrap.append(text);
+    if(q.type==='likert'){
+      const row=document.createElement('div');row.className='rating-row';row.setAttribute('role','group');row.setAttribute('aria-label',text.textContent);
+      for(let i=1;i<=5;i++){
+        const label=document.createElement('label');const input=document.createElement('input');
+        input.type='radio';input.name=q.id;input.value=String(i);input.required=(q.required!==false);
+        const span=document.createElement('span');span.textContent=String(i);
+        label.append(input,span);row.append(label);
+      }
+      const marks=document.createElement('div');marks.className='scale-labels';
+      const left=document.createElement('span');left.textContent=i18n('stronglyDisagree');
+      const right=document.createElement('span');right.textContent=i18n('stronglyAgree');
+      marks.append(left,right);wrap.append(row,marks);
+    }else if(q.type==='single'){
+      const select=document.createElement('select');select.className='field';select.name=q.id;select.required=q.required!==false;
+      const empty=document.createElement('option');empty.value='';empty.textContent='—';select.append(empty);
+      for(const o of (q.options||[])){
+        const opt=document.createElement('option');opt.value=o.value;opt.textContent=lang==='vi'?o.vi:o.en||o.vi;select.append(opt);
+      }
+      wrap.append(select);
+    }else{
+      const field=document.createElement('textarea');field.className='field';field.name=q.id;field.rows=3;field.required=q.required!==false;wrap.append(field);
+    }
+    list.append(wrap);
+    if(prev[q.id]){
+      const prior = prev[q.id];
+      const control = [...wrap.querySelectorAll('[name]')].find(el=>el.value===prior);
+      if(control && control.type==='radio') control.checked=true;
+      else {
+        const target=wrap.querySelector('[name]');
+        if(target && target.type!=='radio') target.value=prior;
+      }
+    }
+  });
+}
+function updateStorageHint(){
+  $('#storageStatus').textContent=APPS_SCRIPT_URL.trim()?i18n('sheetConfigured'):i18n('demoStorage');
+}
+function localSave(payload){
+  try{
+    const existing=JSON.parse(localStorage.getItem(LOCAL_BACKUP_KEY)||'[]');
+    existing.push(payload);
+    localStorage.setItem(LOCAL_BACKUP_KEY,JSON.stringify(existing));
+  }catch(err){ console.warn('Local backup unavailable',err); }
+}
+function status(text,isError=false){
+  const node=$('#submitStatus');node.textContent=text;node.classList.toggle('error',isError);
+}
+$('#surveyForm').addEventListener('submit',async event=>{
+  event.preventDefault();
+  const data=new FormData(event.currentTarget);
+  const answers={};let missing=false;
+  for(const question of questions){
+    const value=(data.get(question.id)||'').toString().trim();
+    if(!value && question.required!==false) missing=true;
+    answers[question.id]=value;
+  }
+  if(missing || !$('#consent').checked){status(i18n('incomplete'),true);return;}
+  const response_id='r_'+idString();
+  const payload={
+    app:'bitis-ar-research-v1',response_id,participant_id:sessionId,
+    survey_version:survey.version||'unset',language:lang,
+    ar_launch_clicked:stats.arLaunchClicked,ar_entered:stats.arEntered,
+    viewer_interactions:stats.viewerInteractions,answers
+  };
+  localSave(payload);
+  const btn=$('#submitButton');btn.disabled=true;
+  if(!APPS_SCRIPT_URL.trim()){
+    status(i18n('savedLocal'));btn.disabled=false;return;
+  }
+  status(i18n('saving'));
+  try{
+    // Simple cross-origin POST, compatible with Apps Script.
+    // No-cors returns an opaque response, so we confirm via JSONP receipt below.
+    await fetch(APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',body:new URLSearchParams({payload:JSON.stringify(payload)})});
+    const confirmed=await checkSheetReceipt(response_id);
+    status(confirmed?i18n('savedSheet'):i18n('receiptUnknown'),!confirmed);
+    if(confirmed) btn.textContent=lang==='vi'?'ĐÃ GỬI THÀNH CÔNG ✓':'SUBMISSION CONFIRMED ✓';
+  }catch(err){
+    console.warn('Google Sheets submission failed',err);
+    status(i18n('receiptUnknown'),true);
+  }finally{btn.disabled=false;}
+});
+function checkSheetReceipt(responseId){
+  return new Promise(resolve=>{
+    let settled=false;let count=0;
+    function finish(ok){if(settled)return;settled=true;resolve(Boolean(ok));}
+    window.__sheetReceipt=(id,found)=>{if(id===responseId && found)finish(true);};
+    function attempt(){
+      if(settled)return;
+      if(count>=4){finish(false);return;}
+      count++;
+      const script=document.createElement('script');
+      script.src=APPS_SCRIPT_URL+'?mode=receipt&id='+encodeURIComponent(responseId)+'&t='+Date.now();
+      script.onload=()=>{script.remove();setTimeout(attempt,750)};
+      script.onerror=()=>{script.remove();setTimeout(attempt,750)};
+      document.head.append(script);
+    }
+    attempt();
+  });
+}
+function escapeCsv(value){
+  let val=String(value??'');if(/^[=+@\-\t\r]/.test(val))val="'"+val;
+  return '"'+val.replace(/"/g,'""')+'"';
+}
+$('#exportCSV').addEventListener('click',()=>{
+  let records=[];try{records=JSON.parse(localStorage.getItem(LOCAL_BACKUP_KEY)||'[]')}catch(e){}
+  if(!records.length){alert(i18n('exportEmpty'));return;}
+  const keys=[...new Set(records.flatMap(r=>Object.keys(r.answers||{})))];
+  const cols=['response_id','participant_id','survey_version','language','ar_launch_clicked','ar_entered','viewer_interactions',...keys];
+  const lines=[cols.join(',')].concat(records.map(r=>cols.map(k=>escapeCsv(r[k]??r.answers?.[k])).join(',')));
+  const url=URL.createObjectURL(new Blob(['\ufeff'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'}));
+  const a=document.createElement('a');a.href=url;a.download='bitis-ar-local-backup.csv';a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1500);
+});
+const viewer=$('#shoeViewer');
+viewer.addEventListener('pointerdown',()=>{stats.viewerInteractions++});
+viewer.addEventListener('ar-status',e=>{
+  if(e.detail?.status==='session-started')stats.arEntered=true;
+});
+viewer.addEventListener('load',()=>{$('#fallbackImage').hidden=true;});
+viewer.addEventListener('error',()=>console.warn('Model unavailable: check matric10-inspired.glb location and model-viewer library.'));
+$('#launchAR').addEventListener('click',async()=>{
+  stats.arLaunchClicked++;
+  if(!viewer.canActivateAR || typeof viewer.activateAR!=='function'){
+    $('#arMessage').textContent=i18n('noAR');return;
+  }
+  $('#arMessage').textContent=i18n('arOpening');
+  try { await viewer.activateAR(); }
+  catch(err){ console.warn('AR launch failed',err);$('#arMessage').textContent=i18n('arFailed'); }
+});
+setLanguage('vi');
+</script>
+</body>
+</html>
