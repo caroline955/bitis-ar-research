@@ -87,6 +87,26 @@
     @media(max-width:1100px){.container{width:min(100% - 42px,960px)}.main-grid{grid-template-columns:1fr}.stage{height:520px}.headline{align-items:start}.summary{max-width:330px}}
     @media(max-width:700px){header{height:67px}.research-wordmark{display:none}.header-right{gap:12px}.topline{margin-top:26px}.tag{display:none}.headline{display:block;margin-bottom:23px}h1{font-size:41px}.summary{max-width:none;margin-top:15px}.container{width:calc(100% - 30px)}.stage{height:370px;margin:0 10px}.viewer-top,.viewer-lower{padding-left:18px;padding-right:18px}.viewer-badge{left:10px;top:11px}.ar-btn{right:10px;bottom:12px;padding:12px}.model-note{left:10px;bottom:12px;max-width:45%;font-size:10px}.viewer-lower{display:block}.reference-link{display:inline-block;margin-top:10px}.material{padding:13px 9px}.material span{font-size:10px}.survey-card{padding:23px 20px}.footer{display:block}}
     @media(max-width:395px){.stage{height:320px}.material-strip{grid-template-columns:1fr}.material{border-right:0;border-bottom:1px solid var(--line)}.model-note{display:none}}
+
+    .viewer-modes{display:flex;gap:8px;padding:0 29px 14px;flex-wrap:wrap}
+    .mode-btn{border:1px solid var(--line);background:#fff;color:var(--deep);padding:9px 14px;font-size:11px;font-weight:700;letter-spacing:.3px}
+    .mode-btn.active{background:var(--deep);border-color:var(--deep);color:white}
+    .photographic-stage{position:absolute;inset:0;z-index:2;background:#eef3ee;display:flex;align-items:center;justify-content:center;touch-action:pan-y}
+    .photographic-stage[hidden]{display:none}
+    .photographic-stage img{width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply;user-select:none;-webkit-user-drag:none;pointer-events:none}
+    .photo-arrow{z-index:2;position:absolute;top:49%;transform:translateY(-50%);width:34px;height:42px;background:rgba(255,255,255,.89);border:1px solid var(--line);color:var(--deep);font-size:23px;display:grid;place-items:center}
+    .photo-arrow.prev{left:12px}.photo-arrow.next{right:12px}
+    .photo-counter{position:absolute;bottom:12px;right:12px;background:#fff;padding:6px 10px;font-size:11px;letter-spacing:.8px}
+    .photostrip[hidden],.photo-caption[hidden]{display:none!important}
+    .photostrip{display:flex;gap:8px;padding:2px 18px 15px;overflow-x:auto;scrollbar-width:thin}
+    .thumb{flex:0 0 68px;width:68px;height:62px;background:#fff;border:1px solid var(--line);padding:2px;cursor:pointer}
+    .thumb.active{border:2px solid var(--green)}
+    .thumb img{height:100%;width:100%;object-fit:contain}
+    .photo-caption{color:var(--muted);font-size:10px;padding:0 29px 13px}
+    .mode-ar-btn{background:var(--green);color:#fff;border-color:var(--green)}
+    .photographic-mode .viewer-badge{display:none}
+    .photographic-mode .ar-btn{display:none}
+    @media(max-width:700px){.viewer-modes{padding:0 18px 12px}.photostrip{padding:0 10px 13px}.photo-caption{padding:0 18px 12px}}
   </style>
 </head>
 <body>
@@ -114,14 +134,24 @@
         <span class="section-step">01 &nbsp;/&nbsp; AR EXPERIENCE</span>
         <span class="product-ref">BITI'S HUNTER MATRIC 10 · HSW017500TRG</span>
       </div>
-      <div class="stage">
-        <span class="viewer-badge" data-i18n="viewerLabel">MÔ HÌNH 3D · TƯƠNG TÁC</span>
+      <div class="viewer-modes" role="group" aria-label="Chế độ xem sản phẩm">
+        <button class="mode-btn" type="button" id="photoModeBtn" data-i18n="photoMode">ẢNH SẢN PHẨM THẬT · NHIỀU GÓC</button>
+        <button class="mode-btn mode-ar-btn active" type="button" id="arModeBtn" data-i18n="arMode">3D / THỬ AR ↗</button>
+      </div>
+      <div class="stage" id="productStage">
+        <div id="photographicStage" class="photographic-stage" aria-label="Ảnh chụp nhiều góc của giày Biti's">
+          <img id="angleImage" src="./photo-01.jpg" alt="Ảnh mẫu giày Biti's Hunter Matric 10 mặt ngoài" draggable="false">
+          <button class="photo-arrow prev" id="prevPhoto" type="button" aria-label="Ảnh trước">‹</button>
+          <button class="photo-arrow next" id="nextPhoto" type="button" aria-label="Ảnh tiếp">›</button>
+          <span class="photo-counter" id="photoCounter">01 / 06</span>
+        </div>
+        <span class="viewer-badge" data-i18n="viewerLabel">MÔ HÌNH 3D XẤP XỈ · TƯƠNG TÁC</span>
         <img class="fallback-image" id="fallbackImage" src="./shoe-cutout.png" alt="Ảnh tham chiếu Biti’s Hunter Matric 10" aria-hidden="true">
         <model-viewer
           id="shoeViewer"
-          src="./matric10-inspired.glb"
+          src="./matric10-photo-assisted.glb"
           poster="./product-reference.jpg"
-          alt="Mô hình 3D minh họa giày Biti's Hunter Matric 10 trắng bạc đen"
+          alt="Mô hình 3D xấp xỉ tham chiếu ảnh Biti's Hunter Matric 10 trắng bạc đen"
           camera-controls
           auto-rotate
           rotation-per-second="20deg"
@@ -137,10 +167,12 @@
         <div class="model-note" data-i18n="viewerHint">Kéo để xoay · Chụm để phóng to</div>
         <button class="ar-btn" id="launchAR" type="button" data-i18n="arButton">ĐẶT GIÀY VÀO KHÔNG GIAN THẬT ↗</button>
       </div>
+      <div class="photostrip" id="photostrip" aria-label="Các góc chụp sản phẩm"></div>
+      <div class="photo-caption" id="photoCaption" data-i18n="photoCaption">Ảnh thật do bạn cung cấp · vuốt hoặc chọn góc để xem · ảnh nhiều góc không phải AR</div>
       <div class="viewer-lower">
         <div>
           <h2 class="model-title">Biti's Hunter Matric 10</h2>
-          <p class="model-description" data-i18n="productSub">Mẫu nữ màu trắng · HSW017500TRG · Mô hình 3D dựng minh họa, không phải bản quét chính thức.</p>
+          <p class="model-description" data-i18n="productSub">Mẫu nữ màu trắng · HSW017500TRG · Mô hình 3D xấp xỉ có tham chiếu ảnh thật, không phải bản quét chính thức.</p>
           <p id="arMessage" class="notice" role="status" aria-live="polite"></p>
         </div>
         <a class="reference-link" href="https://bitis.com.vn/products/giay-the-thao-nu-biti-s-hunter-matric-10-mau-trang-hsw017500trg" target="_blank" rel="noopener noreferrer" data-i18n="originalProduct">Sản phẩm gốc ↗</a>
@@ -182,16 +214,17 @@
    3. Dán URL /exec vào bên dưới.
    Nếu để trống, form lưu thử ở trình duyệt và KHÔNG gửi về Sheet.
 =========================================================== */
-const APPS_SCRIPT_URL = 'https://script.google.com/u/0/home/projects/18QaNbK98JUTtwpgb2b6cGNWbMCanUP--fiRyhlDCNmScmWxjA-SkfjL1/edit';
+const APPS_SCRIPT_URL = '';
 const LOCAL_BACKUP_KEY = 'bitis-ar-research-local-responses-v1';
 
 const translations = {
   vi: {
+    photoMode:'ẢNH THẬT · NHIỀU GÓC',arMode:'3D / THỬ AR ↗',photoCaption:'Ảnh sản phẩm thật · vuốt để đổi góc · ảnh nhiều góc không phải AR',
     surveyNav:'Bảng hỏi',heroTitle:'Nhìn gần hơn.<br><em>Hiểu sâu hơn.</em>',
     heroText:'Một trải nghiệm AR giúp bạn khám phá sản phẩm trong không gian thật. Sau đó, hãy chia sẻ cảm nhận của bạn qua bảng hỏi ngắn.',
     viewerLabel:'MÔ HÌNH 3D · TƯƠNG TÁC',viewerHint:'Kéo để xoay · Chụm để phóng to',
     arButton:'ĐẶT GIÀY VÀO KHÔNG GIAN THẬT ↗',
-    productSub:'Mẫu nữ màu trắng · HSW017500TRG · Mô hình 3D dựng minh họa, không phải bản quét chính thức.',
+    productSub:'Mẫu nữ màu trắng · HSW017500TRG · Mô hình 3D xấp xỉ có tham chiếu ảnh thật, không phải bản quét chính thức.',
     originalProduct:'Sản phẩm gốc ↗',materials1:'Dây giày', materials1Desc:'Thiết kế dây buộc màu trắng.',
     materials2:'Thân giày',materials2Desc:'Phối lưới trắng, bạc và nét đen.',
     materials3:'Đế giày',materials3Desc:'Đế tạo hình nhiều lớp, tông sáng.',
@@ -215,11 +248,12 @@ const translations = {
     exportEmpty:'Chưa có câu trả lời được lưu trên trình duyệt.'
   },
   en: {
+    photoMode:'REAL PRODUCT PHOTOS · MULTI-ANGLE',arMode:'3D / TRY AR ↗',photoCaption:'Real product photos · swipe to change view · multi-angle photos are not AR',
     surveyNav:'Questionnaire',heroTitle:'See closer.<br><em>Understand more.</em>',
     heroText:'An AR experience that brings a product into your real world. Then share your impressions through a short questionnaire.',
     viewerLabel:'INTERACTIVE · 3D MODEL',viewerHint:'Drag to rotate · Pinch to zoom',
     arButton:'PLACE THE SHOE IN YOUR SPACE ↗',
-    productSub:'White women’s sneaker · HSW017500TRG · Illustrative 3D concept, not an official scan.',
+    productSub:'White women’s sneaker · HSW017500TRG · Approximate photo-assisted 3D concept, not an official scan.',
     originalProduct:'Original product ↗',materials1:'Laces',materials1Desc:'White lace-up design.',
     materials2:'Upper',materials2Desc:'White mesh look, silver and black accents.',
     materials3:'Sole',materials3Desc:'Layered sculptural sole in light tones.',
@@ -246,6 +280,59 @@ const translations = {
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 let lang = 'vi';
+let currentMode = 'ar';
+let visited3D = true;
+const viewedPhotoIndexes = new Set();
+let activePhoto = 0;
+const photoViews = [
+  {vi:'Mặt ngoài',en:'Outer side'},
+  {vi:'Mặt trong',en:'Inner side'},
+  {vi:'Phối cảnh đôi',en:'Pair overview'},
+  {vi:'Từ phía trên',en:'Top angle'},
+  {vi:'Chi tiết đế',en:'Outsole detail'},
+  {vi:'Mặt sau',en:'Rear view'}
+];
+function showPhoto(index){
+  activePhoto=(index+photoViews.length)%photoViews.length;
+  if(currentMode==='photos') viewedPhotoIndexes.add(activePhoto);
+  const img=$('#angleImage');
+  img.src=`./photo-${String(activePhoto+1).padStart(2,'0')}.jpg`;
+  img.alt=(lang==='vi'?photoViews[activePhoto].vi:photoViews[activePhoto].en)+' — Biti’s Hunter Matric 10';
+  $('#photoCounter').textContent=String(activePhoto+1).padStart(2,'0')+' / 06';
+  [...$('#photostrip').children].forEach((el,i)=>{el.classList.toggle('active',i===activePhoto);el.setAttribute('aria-pressed',String(i===activePhoto));});
+}
+function setProductMode(mode){
+  currentMode=mode;
+  if(mode==='ar') visited3D=true;
+  const photos=mode==='photos';
+  if(photos) viewedPhotoIndexes.add(activePhoto);
+  $('#photographicStage').hidden=!photos;
+  $('#photostrip').hidden=!photos;
+  $('#photoCaption').hidden=!photos;
+  $('#shoeViewer').style.visibility=photos?'hidden':'visible';
+  $('#launchAR').hidden=photos;
+  $('#productStage').classList.toggle('photographic-mode',photos);
+  $('#photoModeBtn').classList.toggle('active',photos);
+  $('#arModeBtn').classList.toggle('active',!photos);
+  $('#photoModeBtn').setAttribute('aria-pressed',String(photos));
+  $('#arModeBtn').setAttribute('aria-pressed',String(!photos));
+}
+const photosNode=$('#photostrip');
+photoViews.forEach((view,index)=>{
+  const button=document.createElement('button');button.type='button';button.className='thumb';
+  button.title=view.vi;
+  const im=document.createElement('img');im.src=`./photo-${String(index+1).padStart(2,'0')}.jpg`;im.alt=view.vi;
+  button.appendChild(im);button.addEventListener('click',()=>showPhoto(index));photosNode.appendChild(button);
+});
+$('#photoModeBtn').addEventListener('click',()=>setProductMode('photos'));
+$('#arModeBtn').addEventListener('click',()=>setProductMode('ar'));
+$('#prevPhoto').addEventListener('click',()=>showPhoto(activePhoto-1));
+$('#nextPhoto').addEventListener('click',()=>showPhoto(activePhoto+1));
+let dragStartX=null;
+$('#photographicStage').addEventListener('pointerdown',e=>{dragStartX=e.clientX});
+$('#photographicStage').addEventListener('pointerup',e=>{if(dragStartX!==null&&Math.abs(e.clientX-dragStartX)>35){showPhoto(activePhoto+(e.clientX<dragStartX?1:-1));}dragStartX=null});
+showPhoto(0);setProductMode('ar');
+
 const survey = window.QUESTIONNAIRE || {version:'unconfigured',isDemo:false,questions:[]};
 const questions = Array.isArray(survey.questions) ? survey.questions : [];
 const stats = {arLaunchClicked:0, arEntered:false, viewerInteractions:0};
@@ -337,7 +424,7 @@ $('#surveyForm').addEventListener('submit',async event=>{
     app:'bitis-ar-research-v1',response_id,participant_id:sessionId,
     survey_version:survey.version||'unset',language:lang,
     ar_launch_clicked:stats.arLaunchClicked,ar_entered:stats.arEntered,
-    viewer_interactions:stats.viewerInteractions,answers
+    viewer_interactions:stats.viewerInteractions,answers:{...answers,EXPERIENCE_MODE:currentMode,PHOTO_ANGLES_VIEWED:String(viewedPhotoIndexes.size),THREED_MODE_VISITED:String(visited3D)}
   };
   localSave(payload);
   const btn=$('#submitButton');btn.disabled=true;
